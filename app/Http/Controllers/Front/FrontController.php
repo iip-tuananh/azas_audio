@@ -142,16 +142,24 @@ class FrontController extends Controller
         $grouped = collect($attributes)
             ->groupBy('id')
             ->mapWithKeys(function ($group) {
-                $name = data_get($group->first(), 'name', 'unknown');
+                $first = $group->first();
+                $name  = data_get($first, 'name', 'unknown');
+
                 $values = $group->pluck('pivot.value')
-                    ->filter(fn($v) => $v !== null && $v !== '')
-                    ->map(fn($v) => is_string($v) ? trim($v) : $v)
+                    ->filter(function ($v) {
+                        return $v !== null && $v !== '';
+                    })
+                    ->map(function ($v) {
+                        return is_string($v) ? trim($v) : $v;
+                    })
                     ->unique()
                     ->values()
                     ->all();
+
                 return [$name => $values];
             })
             ->toArray();
+
         $product->attributesInfo = $grouped;
 
         $otherProducts = Product::query()->with(['image'])
