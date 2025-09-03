@@ -1,0 +1,6 @@
+#page_index .homebanner img {
+    height: auto;
+}
+#page_index .homebanner .owl-carousel .owl-wrapper-outer.autoHeight {
+    height: unset !important;
+}
