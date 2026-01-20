@@ -45,8 +45,19 @@
                     <span id="hide_nav">X</span>
                 </div>
             </li>
+            <li class="cate_items">
+                <span><a href="{{ route('front.home-page') }}">Trang chủ</a></span>
+            </li>
 
-            @foreach($categories as $cate)
+            @foreach($postCategories as $postCategory)
+                <li class="cate_items">
+                    <span><a href="{{ route('front.blogs', $postCategory->slug) }}">{{ $postCategory->name }}</a></span>
+                </li>
+
+            @endforeach
+
+
+        @foreach($categories as $cate)
                 @if($cate->childs()->count())
                     <li class="cate_items">
                         <span><a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a><span class="toggle_arrow">+</span></span>

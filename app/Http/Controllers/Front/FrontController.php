@@ -113,23 +113,50 @@ class FrontController extends Controller
     }
 
     public function getCategoryProduct($slug) {
-        $data['category'] = Category::findBySlug($slug);
+        $data['category'] = Category::query()
+            ->where('slug', $slug)
+            ->with([
+                'parent:id,parent_id',
+                'childs:id,parent_id,name,slug,sort_order',
+                'childs.childs:id,parent_id,name,slug,sort_order',
+            ])
+            ->firstOrFail();
+
+        $cateIds = collect([$data['category']->id])
+            ->merge($data['category']->childs->pluck('id'))
+            ->merge(
+                $data['category']->childs->flatMap(function ($child) {
+                    return $child->childs->pluck('id');
+                })
+            )
+            ->unique()
+            ->values()
+            ->all();
+
+        $data['products'] = Product::query()
+            ->whereIn('cate_id', $cateIds)
+            ->latest()
+            ->paginate(24);
+
+        $current = $data['category'];
+
+        $data['allCategories'] = collect();
+
+        $isLevel2 = ($current->parent_id != 0) && ($current->parent && $current->parent->parent_id != 0);
+
+        if (!$isLevel2) {
+            // Level 0 hoặc Level 1 => lấy con trực tiếp của nó
+            $data['allCategories'] = Category::query()
+                ->where('parent_id', $current->id)
+                ->orderBy('sort_order')
+                ->get();
+        }
+
         // cate là cate con
         if($data['category']->parent_id) {
-            $data['products'] = Product::query()
-                ->where('cate_id', $data['category']->id)
-                ->latest()
-                ->paginate(24);
             $data['cateParent'] = Category::query()->find($data['category']->parent_id);
-            $data['allCategories'] = Category::query()->where('parent_id', $data['category']->parent_id)->get();
 
         } else {
-            $allChildsCateId = Category::query()->where('parent_id', $data['category']->id)->pluck('id')->toArray();
-            $data['products'] = Product::query()
-                ->whereIn('cate_id', $allChildsCateId)
-                ->latest()
-                ->paginate(24);
-            $data['allCategories'] = Category::query()->whereIn('id', $allChildsCateId)->get();
             $data['cateParent'] = null;
         }
 

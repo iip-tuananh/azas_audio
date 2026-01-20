@@ -87,7 +87,7 @@
                 <li class="item">
                     <div class="item-label">
                     </div>
-                    <a href="loa-bose-201-v-chinh-hang" title="{{ $product->name }}">
+                    <a href="{{ route('front.getProductDetail', $product->slug) }}" title="{{ $product->name }}">
                         <picture class="img">
                             <source height="166" width="166" class="lazyload photo"
                                     srcset="{{ $product->image->path ?? '' }}"
@@ -145,5 +145,6 @@
 
 @push('scripts')
     <script src="/site/custom-js/product-list-mobile.js"></script>
+    <script src="/site/custom-js/home-page-mobile.js"></script>
 
 @endpush

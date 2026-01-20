@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use File as FileSystem;
 use App\Model\Common\File;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Storage;
@@ -61,7 +62,26 @@ class FileHelper
 
             if (filter_var($urlimg, FILTER_VALIDATE_URL) &&
                 preg_match('/^https:\/\/imagedelivery\.net\/[A-Za-z0-9_-]+\/[A-Za-z0-9-]+\/(public|private)$/', $urlimg)) {
-                $instance->cloudflareService->deleteImage($urlimg);
+
+                try {
+                    $instance->cloudflareService->deleteImage($urlimg);
+                } catch (ClientException $exception) {
+                    $res    = $exception->getResponse();
+                    $status = $res ? $res->getStatusCode() : 0;
+
+                    if ($status === 404) {
+                    } else {
+                        \Log::error('Cloudflare delete image failed', [
+                            'url'     => $urlimg,
+                            'status'  => $status,
+                            'message' => $exception->getMessage(),
+                        ]);
+
+                        throw $exception;
+                    }
+
+                }
+
             }
 
         }

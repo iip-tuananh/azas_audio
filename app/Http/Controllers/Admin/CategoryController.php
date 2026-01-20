@@ -38,24 +38,37 @@ class CategoryController extends Controller
             $data = json_decode($data['data']);
             $readbleArray = $this->parseJsonArray($data);
             $i=0;
-            foreach($readbleArray as $row){
-                $parentID = $row['parentID'];
+            foreach ($readbleArray as $row) {
+                $parentID = (int) ($row['parentID'] ?? 0);
+                $level    = 0;
 
-                if($row['parentID']) {
+                if ($parentID) {
                     $parent = ThisModel::find($parentID);
-                    $level = ThisModel::where('id', $row['parentID'])->first()->level + 1;
-                } else {
-                    $level = 0;
+                    $level  = $parent ? ((int) $parent->level + 1) : 0;
+                    if (!$parent) $parentID = 0;
+
+                    // Tối đa level = 2 (3 cấp)
+                    if ($level > 2) {
+                        $parentID = (int) ($parent->parent_id ?? 0);
+
+                        $grand = $parentID ? ThisModel::find($parentID) : null;
+                        $level = $grand ? ((int) $grand->level + 1) : 0;
+
+                        if ($level > 2) $level = 2;
+                    }
                 }
+
                 $i++;
 
-                if ($level > 1) {
-                    $level  = 1;
-                    $parentID = $parent->parent_id;
-                }
-
-                DB::table('categories')->where('id',$row['id'])->update(['parent_id' => $parentID, 'sort_order' => $i, 'level' => $level]);
+                DB::table('categories')
+                    ->where('id', (int) $row['id'])
+                    ->update([
+                        'parent_id'  => $parentID,
+                        'sort_order' => $i,
+                        'level'      => $level,
+                    ]);
             }
+
 
             $json->success = true;
             $json->message = "Sắp xếp thành công";

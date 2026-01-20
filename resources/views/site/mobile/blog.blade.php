@@ -49,7 +49,7 @@
         <ul class="newslist">
             @foreach($blogs as $blog)
                 <li>
-                    <a href="{{ route('front.blogDetail', $blog->slug) }}l">
+                    <a href="{{ route('front.blogDetail', $blog->slug) }}">
                         <picture class="tempvideo">
                             <source width="140" height="80" class="lazyload" srcset="{{ $blog->image->path ?? '' }}" type="image/webp" />
                             <img class="" data-src="{{ $blog->image->path ?? '' }}" width="140" height="80"

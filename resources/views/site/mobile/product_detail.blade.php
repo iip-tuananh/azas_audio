@@ -280,6 +280,8 @@
 
 @endpush
 
+
+
 @push('scripts_angular')
     <script>
         app.controller('productPage', function ($rootScope, $scope, cartItemSync, $interval) {

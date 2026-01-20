@@ -100,23 +100,135 @@
                 <li class=" ">
                     <a href="{{ route('front.home-page') }}">Trang chủ</a>
                 </li>
-                @foreach($categories as $cate)
-                    @if($cate->childs()->count())
-                        <li class=" hassub">
-                            <a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a>
-                            <div class="sub_cat sub_cat_492">
-                                @foreach($cate->childs as $child)
-                                    <a href="{{ route('front.getCategoryProduct', $child->slug) }}">{{ $child->name }}</a>
-                                @endforeach
+{{--                @foreach($categories as $cate)--}}
+{{--                    @if($cate->childs()->count())--}}
+{{--                        <li class=" hassub">--}}
+{{--                            <a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a>--}}
+{{--                            <div class="sub_cat sub_cat_492">--}}
+{{--                                @foreach($cate->childs as $child)--}}
+{{--                                    <a href="{{ route('front.getCategoryProduct', $child->slug) }}">{{ $child->name }}</a>--}}
+{{--                                @endforeach--}}
 
-                            </div>
+{{--                            </div>--}}
+{{--                        </li>--}}
+{{--                    @else--}}
+{{--                        <li class=" ">--}}
+{{--                            <a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a>--}}
+{{--                        </li>--}}
+{{--                    @endif--}}
+{{--                @endforeach--}}
+
+            <style>
+                /* Item cha phải position để con absolute bám theo */
+                .menu-item { position: relative; }
+
+                /* Submenu mặc định ẩn */
+                .sub-menu{
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    min-width: 220px;
+                    background: #fff;
+                    border: 1px solid rgba(0,0,0,.08);
+                    box-shadow: 0 10px 30px rgba(0,0,0,.10);
+                    padding: 8px 0;
+                    z-index: 999;
+                }
+
+                /* Cấp 2: xổ xuống dưới cấp 1 */
+                .sub-menu-lv2{
+                    top: 100%;
+                    left: 0;
+                }
+
+                /* Hover thì hiện */
+                .menu-item.has-sub:hover > .sub-menu-lv2{
+                    display: block;
+                }
+                .menu-item.has-sub-right:hover > .sub-menu-lv3{
+                    display: block;
+                }
+
+                /* Link style */
+                .sub-menu li a{
+                    display: block;
+                    padding: 8px 12px;
+                    white-space: nowrap;
+                }
+                .sub-menu li a:hover{
+                    background: rgba(0,0,0,.04);
+                }
+
+                /* Mũi tên báo có submenu (tuỳ chọn) */
+                .menu-item.has-sub > a::after,
+                .menu-item.has-sub-right > a::after{
+                    content: "›";
+                    float: right;
+                    opacity: .6;
+                    margin-left: 10px;
+                }
+
+                /* cấp 1 mũi tên xuống (tuỳ chọn nhìn dễ hơn) */
+                .menu-item.has-sub > a::after{
+                    content: "▾";
+                }
+                .menu-item.has-sub-right > a::after{
+                    content: "›";
+                }
+
+                /* Tránh bị “hở” khi rê chuột sang phải: tăng vùng hover */
+                .menu-item.has-sub-right{ padding-right: 10px; }
+
+            </style>
+
+                @foreach($postCategories as $postCategory)
+                    <li class=" ">
+                        <a href="{{ route('front.blogs', $postCategory->slug) }}">{{ $postCategory->name }}</a>
+                    </li>
+                @endforeach
+
+
+                @foreach($categories as $cate)
+                    @php $lv2s = $cate->childs; @endphp
+
+                    @if($lv2s->count())
+                        <li class="menu-item has-sub">
+                            <a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a>
+
+                            <ul class="sub-menu sub-menu-lv2">
+                                @foreach($lv2s as $child)
+                                    @php $lv3s = $child->childs; @endphp
+
+                                    @if($lv3s->count())
+                                        <li class="menu-item has-sub-right">
+                                            <a href="{{ route('front.getCategoryProduct', $child->slug) }}">{{ $child->name }}</a>
+
+                                            <ul class="sub-menu sub-menu-lv3">
+                                                @foreach($lv3s as $subChild)
+                                                    <li class="menu-item">
+                                                        <a href="{{ route('front.getCategoryProduct', $subChild->slug) }}">{{ $subChild->name }}</a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </li>
+                                    @else
+                                        <li class="menu-item">
+                                            <a href="{{ route('front.getCategoryProduct', $child->slug) }}">{{ $child->name }}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
                         </li>
                     @else
-                        <li class=" ">
+                        <li class="menu-item">
                             <a href="{{ route('front.getCategoryProduct', $cate->slug) }}">{{ $cate->name }}</a>
                         </li>
                     @endif
                 @endforeach
+
+
+
                 <li class=" ">
                     <a href="{{ route('front.about_page') }}">Giới thiệu</a>
                 </li>

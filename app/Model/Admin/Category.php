@@ -67,7 +67,7 @@ class Category extends BaseModel
 
     public function childs()
     {
-        return $this->hasMany(self::class, 'parent_id')->where('level', 1)->orderBy('sort_order');
+        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
     }
 
     public function tours() {

@@ -25,7 +25,12 @@ class HeaderComposer
     public function compose(View $view)
     {
         $config = Config::query()->get()->first();
-        $categories = Category::query()->with(['childs'])
+        $categories = Category::query()->with(['childs' => function ($query) {
+            $query->with(['childs' => function ($query) {
+                $query->orderBy('sort_order');
+            }])
+            ->orderBy('sort_order');
+        }])
             ->where('parent_id', 0)
             ->orderBy('sort_order')->get();
 
@@ -43,12 +48,15 @@ class HeaderComposer
                 ->get();
         }
 
+        $postCategories = PostCategory::query()->orderBy('sort_order')->get();
+
         $view->with(['config' => $config,
             'categories' => $categories,
             'cartItems' => $cartItems,
             'totalPriceCart' => $totalPriceCart,
             'manufactures' => $manufactures,
             'viewedProducts' => $viewedProducts,
+            'postCategories' => $postCategories,
         ]);
     }
 }

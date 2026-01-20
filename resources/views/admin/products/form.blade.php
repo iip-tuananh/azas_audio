@@ -42,7 +42,7 @@
                 <ui-select-match placeholder="Chọn danh mục">
                     <% $select.selected.name %>
                 </ui-select-match>
-                <ui-select-choices repeat="t.id as t in (form.all_categories | filter: $select.search)" ui-disable-choice="! t.level">
+                <ui-select-choices repeat="t.id as t in (form.all_categories | filter: $select.search)">
                     <span ng-bind="t.name"></span>
                 </ui-select-choices>
             </ui-select>

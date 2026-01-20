@@ -20,7 +20,7 @@
                    </span>
                 </ui-select-match>
 
-                <ui-select-choices repeat="t.id as t in (form.all_categories | filter: $select.search)">
+                <ui-select-choices repeat="t.id as t in (form.all_categories | filter: $select.search)"  ui-disable-choice="t.id === form.id">
                     <span ng-bind="t.name"></span>
 
                     <span class="span-right" ng-if="t.id == form.parent_id">

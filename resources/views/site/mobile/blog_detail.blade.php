@@ -66,7 +66,7 @@
 @endsection
 
 @push('scripts')
-
+    <script src="/site/custom-js/blog-mobile.js"></script>
 
 
 
