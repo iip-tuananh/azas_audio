@@ -167,7 +167,28 @@ class Product extends BaseModel
         }
 
         if (!empty($request->cate_id)) {
-            $result = $result->where('cate_id', $request->cate_id);
+
+            $cate = Category::query()
+                ->select(['id', 'parent_id'])
+                ->with([
+                    'parent:id,parent_id',
+                    'childs:id,parent_id',
+                    'childs.childs:id,parent_id',
+                ])
+                ->find($request->cate_id);
+
+            if ($cate) {
+                $isLevel3 = ($cate->parent_id != 0) && ($cate->parent && $cate->parent->parent_id != 0);
+
+                if ($isLevel3) {
+                    $result = $result->where('cate_id', $cate->id);
+                } else {
+                    $ids = array_merge([$cate->id], $cate->getDescendantIds());
+                    $ids = array_values(array_unique($ids));
+
+                    $result = $result->whereIn('cate_id', $ids);
+                }
+            }
         }
 
         if (!empty($request->manu_id)) {

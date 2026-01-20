@@ -70,6 +70,18 @@ class Category extends BaseModel
         return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
     }
 
+    public function getDescendantIds()
+    {
+        $ids = [];
+
+        foreach ($this->childs as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $child->getDescendantIds());
+        }
+
+        return $ids;
+    }
+
     public function tours() {
         return $this->hasMany(Tour::class,'cate_id');
     }

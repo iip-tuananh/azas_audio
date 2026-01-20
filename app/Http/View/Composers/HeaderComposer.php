@@ -48,7 +48,8 @@ class HeaderComposer
                 ->get();
         }
 
-        $postCategories = PostCategory::query()->orderBy('sort_order')->get();
+        $postCategories = PostCategory::query()->whereIn('parent_id', 0)
+            ->orderBy('sort_order')->get();
 
         $view->with(['config' => $config,
             'categories' => $categories,
